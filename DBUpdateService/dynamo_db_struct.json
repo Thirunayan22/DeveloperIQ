@@ -1,0 +1,80 @@
+{
+  "contributor_name_1": {
+    "week": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "month": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "day": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    }
+  },
+   "contributor_name_2": {
+    "week": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "month": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "day": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    }
+  },
+   "contributor_name_3": {
+    "week": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "month": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    },
+      "day": {
+      "commits": 10,
+      "pull_requests_opened":8,
+      "pull_requests_reviewed": 5,
+      "merged_pull_requests": 4,
+      "issues_created": 6,
+      "issues_answered": 5
+    }
+  }
+}
