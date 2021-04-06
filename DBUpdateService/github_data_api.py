@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import uvicorn
-
+import zulu
+import random
+from datetime import datetime
 """
 For a given username this API should be able to return all information needed for the calculation of the metric for 
 every user
@@ -39,7 +41,7 @@ class ContributorAttr(BaseModel):
     time_frame: str   # "monthly","weekly","daily"
 
 @app.post("/contributor/commits")
-async def get_contributer_commit_count(contributor:ContributorAttr):
+async def get_contributer_commit_count(contributor:ContributorAttr,time_frame:str):
     """
     Gets number of commits made by contributor
 
@@ -53,23 +55,46 @@ async def get_contributer_commit_count(contributor:ContributorAttr):
     }
 
     """
-
-
-    contributor_name = contributor.contributor_name
     # time_frame       = contributor.time_frame
     #TODO FILTER BY TIME RANGE
     # GET TOTAL NUMBER OF ADDITIONS BY QUERYING FOR THE SPECIFIC COMMIT
     # (https://docs.github.com/en/rest/reference/repos#get-a-commit)
 
+##Sort by commits per day , commits per week
+
+    # commits_per_day = {}
+    # prev_date  = 0
+    # temp_num_commit = 0
+    since = None
+    present_time = zulu.now().isoformat().split(".")[0]
+    if time_frame == "year":
+        since = f"{int(present_time.split('-')[0])-1}-{present_time.split('-')[1]}-{present_time.split('-')[2]}"
+    elif time_frame == "month":
+        since = f"{present_time.split('-')[0]}-{int(present_time.split('-')[1])-1}-{present_time.split('-')[2]}"
+    elif time_frame == "day":
+        since = f"{present_time.split('-')[0]}-{present_time.split('-')[1]}-{int(present_time.split('-')[2].split('T')[0])-1}T{present_time.split('-')[2].split('T')[1]}"
+    print(since)
+    contributor_name = contributor.contributor_name
+    url = f"{CONTRIBUTOR_COMMITS_API_URI}?author={contributor_name}&since={since}"
+    raw_contributor_commits =  requests.request("GET",url).json()
 
 
-    print("CONTRIBUTOR_NAME: ",contributor.contributor_name)
-    print("TIMEFRAME: ",contributor.time_frame)
-    url = f"{CONTRIBUTOR_COMMITS_API_URI}?author={contributor_name}"
-    print("URL : ",url)
-    commit_response =  requests.request("GET",url)
-    print("passed GET")
-    return commit_response.json()
+
+    # for commit_idx in range(len(raw_contributor_commits)):
+    #     current_commit = raw_contributor_commits[commit_idx]
+    #
+    #     commit_time_stamp = current_commit["commit"]["committer"]["date"]
+    #     # commit_message = current_commit["commit"]["message"] : OPTIONAL
+    #     commit_date = str(zulu.parse(commit_time_stamp).datetime.date())
+    #     if commit_date != prev_date:
+    #         temp_num_commit = 1
+    #         commits_per_day[commit_date] = temp_num_commit
+    #     else:
+    #         temp_num_commit += 1
+    #         commits_per_day[commit_date] = temp_num_commit
+    #     prev_date = commit_date
+
+    return raw_contributor_commits
 
 
 @app.post("/{contributor_name}/pull-requests")
