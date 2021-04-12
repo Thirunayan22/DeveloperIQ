@@ -36,11 +36,8 @@ CONTIRBUTOR_STATS_URI = "https://api.github.com/repos/RasaHQ/rasa/stats/contribu
 
 
 
-class ContributorAttr(BaseModel):
-    contributor_login: str
-
-@app.post("/contributor/snapshot")
-def get_contributer_commit_count(contributor: ContributorAttr):
+@app.get("/contributor/snapshot")
+def get_contributer_commit_count(contributor_login:str):
     """
     Gets number of commits made by contributor
 
@@ -54,32 +51,37 @@ def get_contributer_commit_count(contributor: ContributorAttr):
     "total_contribution": 325}
     """
 
-    contributor_login = contributor.contributor_login
     contributor_stats = {}
     contributor_commit_stats = requests.request("GET", CONTIRBUTOR_STATS_URI).json()
-    for commit_statistic in contributor_commit_stats[0]:
+    print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
+    for commit_statistic in contributor_commit_stats:
         if commit_statistic["author"]["login"]  == contributor_login:
+            print("commit_statistic : ",commit_statistic)
             contributor_id = commit_statistic["author"]["id"]
-            weekly_commit_contribution = commit_statistic["author"]["weeks"][-1]
-            monthly_commit_contribution = calculate_commit_contribution(commit_statistic["author"]["weeks"][-7:])
-            yearly_commit_contribution = calculate_commit_contribution(commit_statistic["author"]["weeks"][-52:])
+            weekly_commit_contribution = commit_statistic["weeks"][-1]
+            monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-7:])
+            yearly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-52:])
 
             contributor_stats = {
                 contributor_login:{
-                "contribution_id":contributor_id,
-                "weekly_contributions":{
+                "contributor_id":contributor_id,
+                "weekly_contribution":{
                                         "additions":weekly_commit_contribution["a"],
                                         "deletions":weekly_commit_contribution["d"],
                                         "number_of_commits":weekly_commit_contribution["c"]
                                         },
-                "monthly_contributions":monthly_commit_contribution,
-                "yearly_contributions":yearly_commit_contribution
+                "monthly_contribution":monthly_commit_contribution,
+                "yearly_contribution":yearly_commit_contribution
 
             }
             }
             break
 
 
+
+## TODO : GET REPOSITORY ISSUES
+    contributor_issue_stats =   requests.get()
+## TODO : GET REPOSITORY COMMENTS
 
     return contributor_stats
 
