@@ -30,14 +30,17 @@ app = FastAPI()
 # TODO FOURTH : UPDATE DATABASE FROM THE API (THIS CAN BE ANOTHER SERVICE)
 #
 
-CONTIRBUTOR_ISSUES_COMMENTS_URI = "https://api.github.com/repos/RasaHQ/rasa/issuescomments"
-COLLABORATOR_API_URI = "https://api.github.com/repos/RasaHQ/rasa/contributors"
+CONTIRBUTOR_ISSUES_COMMENTS_URI = "https://api.github.com/repos/RasaHQ/rasa/issues/comments"
+CONTIRBUTOR_ISSUES_URI = "https://api.github.com/repos/RasaHQ/rasa/issues"
 CONTIRBUTOR_STATS_URI = "https://api.github.com/repos/RasaHQ/rasa/stats/contributors"
 
 
 
 @app.get("/contributor/snapshot")
 def get_contributer_commit_count(contributor_login:str):
+
+    # TODO : TEST THIS FEATURE MORE EXTRACTIVELY FOR BUGS
+    # TODO : FOCUS ON DATABASE WRITE SERVICE API
     """
     Gets number of commits made by contributor
 
@@ -49,41 +52,84 @@ def get_contributer_commit_count(contributor_login:str):
     @:returns
    DICT:{"commits":20,
     "total_contribution": 325}
+
+    DICT:{
+    pull_requests_created : 12,
+    issues_created : 13,
+    issues_commented_on : 13
+    }
     """
 
-    contributor_stats = {}
     contributor_commit_stats = requests.request("GET", CONTIRBUTOR_STATS_URI).json()
+    weekly_commit_contribution = {}
+    monthly_commit_contribution = {}
+    yearly_commit_contribution = {}
     print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
     for commit_statistic in contributor_commit_stats:
         if commit_statistic["author"]["login"]  == contributor_login:
             print("commit_statistic : ",commit_statistic)
             contributor_id = commit_statistic["author"]["id"]
             weekly_commit_contribution = commit_statistic["weeks"][-1]
-            monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-7:])
+            monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-4:])
             yearly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-52:])
 
-            contributor_stats = {
-                contributor_login:{
-                "contributor_id":contributor_id,
-                "weekly_contribution":{
-                                        "additions":weekly_commit_contribution["a"],
-                                        "deletions":weekly_commit_contribution["d"],
-                                        "number_of_commits":weekly_commit_contribution["c"]
-                                        },
-                "monthly_contribution":monthly_commit_contribution,
-                "yearly_contribution":yearly_commit_contribution
-
-            }
-            }
             break
 
 
 
 ## TODO : GET REPOSITORY ISSUES
-    contributor_issue_stats =   requests.get()
-## TODO : GET REPOSITORY COMMENTS
 
-    return contributor_stats
+    # ISSUES INCLUDE PULL-REQUESTS AS WELL
+    year_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1))).split('.')[0]
+    week_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
+    month_since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
+
+    contributor_issue_stats_url_year  = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={year_since}"
+    contributor_issue_stats_url_week  = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
+    contributor_issue_stats_url_month = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
+
+    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year).json())
+    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week).json())
+    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month).json())
+
+    contributor_comments_url_year = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
+    contributor_comments_url_month = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
+    contributor_comments_url_week = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
+
+    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year).json() if comment["user"]["login"]==contributor_login])
+    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month).json() if comment["user"]["login"]==contributor_login])
+    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week).json() if comment["user"]["login"]==contributor_login])
+
+    contributor_metric_stats = {
+        contributor_login:{
+            "week":{
+                "commit_additions":weekly_commit_contribution["a"],
+                "commit_deletions":weekly_commit_contribution["d"],
+                "num_commits" : weekly_commit_contribution["c"],
+                "issues_created": num_issues_created_week,
+                "issues_comment_interactions": num_comments_week
+            },
+
+            "month":{
+                "commit_additions": monthly_commit_contribution["additions"],
+                "commit_deletions": monthly_commit_contribution["deletions"],
+                "num_commits": monthly_commit_contribution["number_of_commits"],
+                "issues_created": num_issues_created_month,
+                "issues_comment_interactions": num_comments_month
+            },
+
+            "year":{
+                "commit_additons": yearly_commit_contribution["additions"],
+                "commit_deletions":yearly_commit_contribution["deletions"],
+                "num_commits" : yearly_commit_contribution["number_of_commits"],
+                "issues_created":num_issues_created_year,
+                "issues_comment_interactions":num_comments_year
+            }
+
+        }
+    }
+
+    return contributor_metric_stats
 
 
 def calculate_commit_contribution(contribution_lst:List):
