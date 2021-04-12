@@ -30,22 +30,17 @@ app = FastAPI()
 # TODO FOURTH : UPDATE DATABASE FROM THE API (THIS CAN BE ANOTHER SERVICE)
 #
 
-#######
-CONTRIBUTOR_COMMITS_API_URI = "https://api.github.com/repos/RasaHQ/rasa/commits"
-CONTRIBUTOR_PULL_REQUESTS_API_URI = "https://api.github.com/repos/RasaHQ/rasa/pulls"
-CONTRIBUTOR_ISSUES_API_URI = "https://api.github.com/repos/RasaHQ/rasa/issues"
+CONTIRBUTOR_ISSUES_COMMENTS_URI = "https://api.github.com/repos/RasaHQ/rasa/issuescomments"
 COLLABORATOR_API_URI = "https://api.github.com/repos/RasaHQ/rasa/contributors"
+CONTIRBUTOR_STATS_URI = "https://api.github.com/repos/RasaHQ/rasa/stats/contributors"
 
 
-# TODO: Change code to not include contributor name in every decorated parameter call
-# Contributor Attributes
+
 class ContributorAttr(BaseModel):
     contributor_login: str
-    time_frame: str  # "monthly","weekly","daily"
-
 
 @app.post("/contributor/snapshot")
-def get_contributer_commit_count(contributor: ContributorAttr, time_frame: str):
+def get_contributer_commit_count(contributor: ContributorAttr):
     """
     Gets number of commits made by contributor
 
@@ -58,42 +53,53 @@ def get_contributer_commit_count(contributor: ContributorAttr, time_frame: str):
    DICT:{"commits":20,
     "total_contribution": 325}
     """
-    since = None
-    commit_info = {}
-    if time_frame == "year":
-        since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1))).split('.')[0]
-    elif time_frame == "month":
-        since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(months=1))).split('.')[0]
-    elif time_frame == "day":
-        since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(days=1))).split('.')[0]
-    elif time_frame == "week":
-        since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
 
     contributor_login = contributor.contributor_login
-    url = f"{CONTRIBUTOR_COMMITS_API_URI}?author={contributor_login}&since={since}"
-    print(since)
-    raw_contributor_commits = requests.request("GET", url).json()
-    print(raw_contributor_commits)
-    commit_info["contributor_login"] = contributor_login
-    commit_info["contributor_username"] = raw_contributor_commits[0]["commit"]["author"]["name"]
-    commit_info["num_commits"] = len(raw_contributor_commits)
-    commit_info["time_frame"] = time_frame
-    commit_info["commit_additions"] = 0
-    commit_info["commit_deletions"] = 0
+    contributor_stats = {}
+    contributor_commit_stats = requests.request("GET", CONTIRBUTOR_STATS_URI).json()
+    for commit_statistic in contributor_commit_stats[0]:
+        if commit_statistic["author"]["login"]  == contributor_login:
+            contributor_id = commit_statistic["author"]["id"]
+            weekly_commit_contribution = commit_statistic["author"]["weeks"][-1]
+            monthly_commit_contribution = calculate_commit_contribution(commit_statistic["author"]["weeks"][-7:])
+            yearly_commit_contribution = calculate_commit_contribution(commit_statistic["author"]["weeks"][-52:])
 
-    for commit_idx in range(len(raw_contributor_commits)):
-        curr_commit = raw_contributor_commits[commit_idx]
-        commit_ref = curr_commit["sha"]
-        commit_request_url = f"{CONTRIBUTOR_COMMITS_API_URI}/{commit_ref}"
-        commit_info_request = requests.request("GET",commit_request_url).json()
-        print(commit_info_request)
-        commit_additions = commit_info_request["stats"]["additions"]
-        commit_deletions = commit_info_request["stats"]["deletions"]
+            contributor_stats = {
+                contributor_login:{
+                "contribution_id":contributor_id,
+                "weekly_contributions":{
+                                        "additions":weekly_commit_contribution["a"],
+                                        "deletions":weekly_commit_contribution["d"],
+                                        "number_of_commits":weekly_commit_contribution["c"]
+                                        },
+                "monthly_contributions":monthly_commit_contribution,
+                "yearly_contributions":yearly_commit_contribution
 
-        commit_info["commit_additions"] += commit_additions
-        commit_info["commit_deletions"] += commit_deletions
+            }
+            }
+            break
 
-    return commit_info
+
+
+    return contributor_stats
+
+
+def calculate_commit_contribution(contribution_lst:List):
+    total_additions = 0
+    total_deletions = 0
+    total_commits   = 0
+    for contribution_idx in range(len(contribution_lst)):
+            if contribution_idx != 0:
+                total_additions += contribution_lst[contribution_idx-1]["a"]
+                total_deletions += contribution_lst[contribution_idx-1]["d"]
+                total_commits   += contribution_lst[contribution_idx-1]["c"]
+    total_contribution = {
+                    "additions":total_additions,
+                    "deletions":total_deletions,
+                    "number_of_commits":total_commits
+    }
+    return total_contribution
+
 
 
 @app.post("/{contributor_login}/pull-requests")
