@@ -30,14 +30,8 @@ app = FastAPI()
 # TODO FOURTH : UPDATE DATABASE FROM THE API (THIS CAN BE ANOTHER SERVICE)
 #
 
-CONTIRBUTOR_ISSUES_COMMENTS_URI = "https://api.github.com/repos/RasaHQ/rasa/issues/comments"
-CONTIRBUTOR_ISSUES_URI = "https://api.github.com/repos/RasaHQ/rasa/issues"
-CONTIRBUTOR_STATS_URI = "https://api.github.com/repos/RasaHQ/rasa/stats/contributors"
-
-
-
 @app.get("/contributor/snapshot")
-def get_contributer_commit_count(contributor_login:str):
+def get_contributer_commit_count(repo:str,organization:str,contributor:str):
 
     # TODO : TEST THIS FEATURE MORE EXTRACTIVELY FOR BUGS
     # TODO : FOCUS ON DATABASE WRITE SERVICE API
@@ -60,47 +54,49 @@ def get_contributer_commit_count(contributor_login:str):
     }
     """
 
-    contributor_commit_stats = requests.request("GET", CONTIRBUTOR_STATS_URI).json()
+    CONTRIBUTOR_ISSUES_COMMENTS_URI = f"https://api.github.com/repos/{organization}/{repo}/issues/comments"
+    CONTRIBUTOR_ISSUES_URI = f"https://api.github.com/repos/{organization}/{repo}/issues"
+    CONTRIBUTOR_STATS_URI = f"https://api.github.com/repos/{organization}/{repo}/stats/contributors"
+
+
+    contributor_login = contributor
+    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI).json()
     weekly_commit_contribution = {}
     monthly_commit_contribution = {}
     yearly_commit_contribution = {}
     print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
     for commit_statistic in contributor_commit_stats:
         if commit_statistic["author"]["login"]  == contributor_login:
-            print("commit_statistic : ",commit_statistic)
-            contributor_id = commit_statistic["author"]["id"]
             weekly_commit_contribution = commit_statistic["weeks"][-1]
             monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-4:])
             yearly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-52:])
-
             break
 
-
-
-## TODO : GET REPOSITORY ISSUES
-
-    # ISSUES INCLUDE PULL-REQUESTS AS WELL
     year_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1))).split('.')[0]
     week_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
     month_since = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
 
-    contributor_issue_stats_url_year  = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={year_since}"
-    contributor_issue_stats_url_week  = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
-    contributor_issue_stats_url_month = f"{CONTIRBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
+    print("WEEK  : " ,week_since)
+    print("YEAR  : ",year_since)
+    print("MONTH : ",month_since)
+    contributor_issue_stats_url_year  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={year_since}"
+    contributor_issue_stats_url_week  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
+    contributor_issue_stats_url_month = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
 
     num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year).json())
     num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week).json())
     num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month).json())
 
-    contributor_comments_url_year = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
-    contributor_comments_url_month = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
-    contributor_comments_url_week = f"{CONTIRBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
+    contributor_comments_url_year = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
+    contributor_comments_url_month = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
+    contributor_comments_url_week = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
 
     num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year).json() if comment["user"]["login"]==contributor_login])
     num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month).json() if comment["user"]["login"]==contributor_login])
     num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week).json() if comment["user"]["login"]==contributor_login])
 
-    contributor_metric_stats = {
+
+    individual_contributor_metric_stats = {
         contributor_login:{
             "week":{
                 "commit_additions":weekly_commit_contribution["a"],
@@ -129,14 +125,15 @@ def get_contributer_commit_count(contributor_login:str):
         }
     }
 
-    return contributor_metric_stats
+    return  individual_contributor_metric_stats
 
 
 def calculate_commit_contribution(contribution_lst:List):
     total_additions = 0
     total_deletions = 0
     total_commits   = 0
-    for contribution_idx in range(len(contribution_lst)):
+
+    for contribution_idx in range(len(contribution_lst)+1):
             if contribution_idx != 0:
                 total_additions += contribution_lst[contribution_idx-1]["a"]
                 total_deletions += contribution_lst[contribution_idx-1]["d"]
@@ -147,22 +144,6 @@ def calculate_commit_contribution(contribution_lst:List):
                     "number_of_commits":total_commits
     }
     return total_contribution
-
-
-
-@app.post("/{contributor_login}/pull-requests")
-async def get_contributor_pull_requests(contributor_name: str, created: bool, reviewed: bool):
-    """" Return Pull Requests from contributor """
-    # TODO : ADD RETURN FORMAT
-    return "reponse:200"
-
-
-@app.post("/{contributor_login}/issue")
-async def get_contributor_issues(contributor_name: str, created: bool, resolved: bool):
-    """" Return issues created by contributer and issues resolved """
-    # TODO : ADD RETURN FORMAT
-
-    return "response:200"
 
 
 if __name__ == "__main__":
