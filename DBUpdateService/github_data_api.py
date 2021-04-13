@@ -95,9 +95,9 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month).json() if comment["user"]["login"]==contributor_login])
     num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week).json() if comment["user"]["login"]==contributor_login])
 
-
     individual_contributor_metric_stats = {
-        contributor_login:{
+        "contributor_login" : contributor_login,
+        "contribution_stats":{
             "week":{
                 "commit_additions":weekly_commit_contribution["a"],
                 "commit_deletions":weekly_commit_contribution["d"],
