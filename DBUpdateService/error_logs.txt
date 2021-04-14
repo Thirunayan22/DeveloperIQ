@@ -1,0 +1,67 @@
+
+(AECS-Assignment) C:\Users\Thirunayan\Desktop\MSc EAD\Semester 3\AECS\AECS-Assignment\DeveloperIQ\DBUpdateService>python db_update_service.py --org=RasaHQ --repo=rasa
+=================== CONTRIBUTOR GITHUB DATA ========================
+{'contributor_login': 'tmbo', 'contribution_stats': {'week': {'commit_additions': 0, 'commit_deletions': 0, 'num_commits': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'month': {'commit_additions': 30, 'commit_deletions': 0, 'num_commits': 1, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'commit_additons': 78974, 'commit_deletions': 60207, 'num_commits': 147, 'issues_created': 12, 'issues_comment_interactions': 0}}}
+==================== CONTRIBUTOR DB DATA ==========================
+{'contribution_stats': {'month': {'commit_additions': 30, 'num_commits': 1, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'num_commits': 147, 'commit_deletions': 60207, 'commit_additons': 78974, 'issues_created': 12, 'issues_comment_interactions': 0}, 'week': {'commit_additions': 0, 'num_commits': 0, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}}, 'contributor_login': 'tmbo'}
+NO CHANGE FOR USER tmbo
+Traceback (most recent call last):
+  File "db_update_service.py", line 118, in <module>
+    response = db_actions.update_all_contributors()
+  File "db_update_service.py", line 101, in update_all_contributors
+    time.sleep(600)
+AttributeError: 'builtin_function_or_method' object has no attribute 'sleep'
+
+(AECS-Assignment) C:\Users\Thirunayan\Desktop\MSc EAD\Semester 3\AECS\AECS-Assignment\DeveloperIQ\DBUpdateService>python db_update_service.py --org=RasaHQ --repo=rasa
+INDEXING CONTRIBUTOR :  tmbo
+=================== CONTRIBUTOR GITHUB DATA ========================
+{'contributor_login': 'tmbo', 'contribution_stats': {'week': {'commit_additions': 0, 'commit_deletions': 0, 'num_commits': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'month': {'commit_additions': 30, 'commit_deletions': 0, 'num_commits': 1, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'commit_additons': 78974, 'commit_deletions': 60207, 'num_commits': 147, 'issues_created': 12, 'issues_comment_interactions': 0}}}
+==================== CONTRIBUTOR DB DATA ==========================
+{'contribution_stats': {'month': {'commit_additions': 30, 'num_commits': 1, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'num_commits': 147, 'commit_deletions': 60207, 'commit_additons': 78974, 'issues_created': 12, 'issues_comment_interactions': 0}, 'week': {'commit_additions': 0, 'num_commits': 0, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}}, 'contributor_login': 'tmbo'}
+NO CHANGE FOR USER tmbo
+Traceback (most recent call last):
+  File "db_update_service.py", line 119, in <module>
+    response = db_actions.update_all_contributors()
+  File "db_update_service.py", line 102, in update_all_contributors
+    sleep(600)
+KeyboardInterrupt
+
+(AECS-Assignment) C:\Users\Thirunayan\Desktop\MSc EAD\Semester 3\AECS\AECS-Assignment\DeveloperIQ\DBUpdateService>python db_update_service.py --org=RasaHQ --repo=rasa --delay=2
+INDEXING CONTRIBUTOR :  tmbo
+=================== CONTRIBUTOR GITHUB DATA ========================
+{'contributor_login': 'tmbo', 'contribution_stats': {'week': {'commit_additions': 0, 'commit_deletions': 0, 'num_commits': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'month': {'commit_additions': 30, 'commit_deletions': 0, 'num_commits': 1, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'commit_additons': 78974, 'commit_deletions': 60207, 'num_commits': 147, 'issues_created': 12, 'issues_comment_interactions': 0}}}
+==================== CONTRIBUTOR DB DATA ==========================
+{'contribution_stats': {'month': {'commit_additions': 30, 'num_commits': 1, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'num_commits': 147, 'commit_deletions': 60207, 'commit_additons': 78974, 'issues_created': 12, 'issues_comment_interactions': 0}, 'week': {'commit_additions': 0, 'num_commits': 0, 'commit_deletions': 0, 'issues_created': 0, 'issues_comment_interactions': 0}}, 'contributor_login': 'tmbo'}
+NO CHANGE FOR USER tmbo
+INDEXING CONTRIBUTOR :  wochinge
+=================== CONTRIBUTOR GITHUB DATA ========================
+{'contributor_login': 'wochinge', 'contribution_stats': {'week': {'commit_additions': 296, 'commit_deletions': 317, 'num_commits': 5, 'issues_created': 13, 'issues_comment_interactions': 2}, 'month': {'commit_additions': 4202, 'commit_deletions': 1382, 'num_commits': 53, 'issues_created': 13, 'issues_comment_interactions': 2}, 'year': {'commit_additons': 56864, 'commit_deletions': 41828, 'num_commits': 795, 'issues_created': 30, 'issues_comment_interactions': 1}}}
+==================== CONTRIBUTOR DB DATA ==========================
+{'contribution_stats': {'month': {'commit_additions': 4202, 'num_commits': 53, 'commit_deletions': 1382, 'issues_created': 13, 'issues_comment_interactions': 2}, 'year': {'num_commits': 795, 'commit_deletions': 41828, 'commit_additons': 56864, 'issues_created': 30, 'issues_comment_interactions': 1}, 'week': {'commit_additions': 296, 'num_commits': 5, 'commit_deletions': 317, 'issues_created': 13, 'issues_comment_interactions': 2}}, 'contributor_login': 'wochinge'}
+NO CHANGE FOR USER wochinge
+INDEXING CONTRIBUTOR :  tabergma
+=================== CONTRIBUTOR GITHUB DATA ========================
+{'contributor_login': 'tabergma', 'contribution_stats': {'week': {'commit_additions': 0, 'commit_deletions': 0, 'num_commits': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'month': {'commit_additions': 0, 'commit_deletions': 0, 'num_commits': 0, 'issues_created': 0, 'issues_comment_interactions': 0}, 'year': {'commit_additons': 14325, 'commit_deletions': 8641, 'num_commits': 297, 'issues_created': 14, 'issues_comment_interactions': 0}}}
+==================== CONTRIBUTOR DB DATA ==========================
+CONTRIBUTOR NOT PRESENT IN DATABASE
+CONTRIBUTOR NOT PRESENT IN CACHING DATABASE
+
+UPDATING DB
+
+INDEXING CONTRIBUTOR :  Ghostvv
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  ricwo
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  erohmensing
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  amn41
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  rasabot
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  akelad
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  m-vdb
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  dakshvar22
+EXCEPTION OCCURED :  Expecting value: line 1 column 1 (char 0)
+INDEXING CONTRIBUTOR :  alwx
