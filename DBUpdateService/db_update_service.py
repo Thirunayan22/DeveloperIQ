@@ -25,6 +25,7 @@ class DBActions:
     def __init__(self,organization,repository):
         self.organization =  organization
         self.repository   = repository
+        self.get_contributors_url = f"http://127.0.0.1:8001/contributors?organization={organization}&repo={repository}"
 
 
     def update_cache_db(self,contributor_login:str):
@@ -87,9 +88,9 @@ class DBActions:
 
     def update_all_contributors(self,delay):
         while True:
-            repository_contributors_url = "https://api.github.com/repos/RasaHQ/rasa/contributors"
 
-            contributors = requests.request("GET",repository_contributors_url).json()
+            contributors = requests.request("GET",self.get_contributors_url).json()
+            print("CONTRIBUTORS : ",contributors)
             for contributor in contributors:
                 try:
                     contributor_login = contributor['login']
@@ -100,7 +101,7 @@ class DBActions:
                     print("CONTRIBUTOR DATA",contributor)
                     continue
                 sleep(delay)
-            sleep(432000)
+            sleep(secs=432000)
 
 
 if __name__ == "__main__":
@@ -115,13 +116,13 @@ if __name__ == "__main__":
     organization = args.org
     repository   = args.repo
     contributor_login = args.login
-    delay  = args.delay
+    delay  = int(args.delay)
 
     db_actions = DBActions(organization,repository)
     response = db_actions.update_all_contributors(delay)
     # response = db_actions.update_cache_db(contributor_login)
     print(f"\n RESPONSE : {response}")
 
-
-
-
+# TODO ADD NGROK TUNNEL IF THERE IS NO OTHER FIX FOR THE API THRESHOLD LIMIT
+# TODO ADD CODE TO CHECK DATABASE FOR IF THE USER EXISTS IN THE DATABASE AND THEN ADD FIRST METRICS OF NEW USERS
+# TODO THEN ADD UPDATES TO METRICS OF OLD USERS

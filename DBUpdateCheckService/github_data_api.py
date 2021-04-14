@@ -54,17 +54,24 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     }
     """
 
+    with open("../github-access-token.txt",'r') as token_file:
+        token = token_file.readline()
+        headers = {
+            'Authorization':f'Basic {token}'
+        }
+
     CONTRIBUTOR_ISSUES_COMMENTS_URI = f"https://api.github.com/repos/{organization}/{repo}/issues/comments"
     CONTRIBUTOR_ISSUES_URI = f"https://api.github.com/repos/{organization}/{repo}/issues"
     CONTRIBUTOR_STATS_URI = f"https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 
 
     contributor_login = contributor
-    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI).json()
+    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI,headers=headers).json()
     weekly_commit_contribution = {}
     monthly_commit_contribution = {}
     yearly_commit_contribution = {}
     print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
+    print("COMMIT",contributor_commit_stats)
     for commit_statistic in contributor_commit_stats:
         if commit_statistic["author"]["login"]  == contributor_login:
             weekly_commit_contribution = commit_statistic["weeks"][-1]
@@ -83,17 +90,17 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     contributor_issue_stats_url_week  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
     contributor_issue_stats_url_month = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
 
-    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year).json())
-    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week).json())
-    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month).json())
+    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year,headers=headers).json())
+    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week,headers=headers).json())
+    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month,headers=headers).json())
 
     contributor_comments_url_year = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
     contributor_comments_url_month = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
     contributor_comments_url_week = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
 
-    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year).json() if comment["user"]["login"]==contributor_login])
-    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month).json() if comment["user"]["login"]==contributor_login])
-    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week).json() if comment["user"]["login"]==contributor_login])
+    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year,headers=headers).json() if comment["user"]["login"]==contributor_login])
+    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month,headers=headers).json() if comment["user"]["login"]==contributor_login])
+    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week,headers=headers).json() if comment["user"]["login"]==contributor_login])
 
     individual_contributor_metric_stats = {
         "contributor_login" : contributor_login,
@@ -126,6 +133,19 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     }
 
     return  individual_contributor_metric_stats
+
+@app.get('/contributors')
+def get_all_contributors(organization:str,repo:str):
+    with open("../github-access-token.txt",'r') as token_file:
+        token = token_file.readline()
+        headers = {
+            'Authorization':f'Basic {token}'
+        }
+
+    repository_contributors_url = f"https://api.github.com/repos/{organization}/{repo}/contributors"
+    contributors = requests.request("GET",repository_contributors_url,headers=headers)
+    print(contributors)
+    return contributors.json()
 
 
 def calculate_commit_contribution(contribution_lst:List):
