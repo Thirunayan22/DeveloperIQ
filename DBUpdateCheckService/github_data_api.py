@@ -19,22 +19,13 @@ every user
 
 app = FastAPI()
 ######
-# STEPS
-# TODO FIRST  : SORT BY DATE DEPENDING ON TIME FRAME SELECTED (Monthly,Weekly,Daily)
-
-# TODO SECOND : EXTRACT ONLY COMMIT INFORMATION ABOUT INDIVIDUAL CONTRIBUTOR IN THEIR
-#  NUMBER OF COMMITS WITHIN THE TIME FRAME, AMOUNT ADDITION, PULL REQUESTS CREATED, PULL REQUESTS REVIEWED AND ACCEPTED ,
-#  ISSUES CREATED
-
-# TODO THIRD  : UPDATE THIS INFORMATION USING A WEBHOOK CREATED ON THE GITHUB REPO ###
-# TODO FOURTH : UPDATE DATABASE FROM THE API (THIS CAN BE ANOTHER SERVICE)
-#
+USER_NAME = "Thirunayan22"
+with open("../github-access-token.txt", 'r') as token_file:
+    token = token_file.readline()
 
 @app.get("/contributor/snapshot")
 def get_contributer_commit_count(repo:str,organization:str,contributor:str):
 
-    # TODO : TEST THIS FEATURE MORE EXTRACTIVELY FOR BUGS
-    # TODO : FOCUS ON DATABASE WRITE SERVICE API
     """
     Gets number of commits made by contributor
 
@@ -54,25 +45,19 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     }
     """
 
-    with open("../github-access-token.txt",'r') as token_file:
-        token = token_file.readline()
-        headers = {
-            'Authorization':f'Basic {token}'
-        }
-
     CONTRIBUTOR_ISSUES_COMMENTS_URI = f"https://api.github.com/repos/{organization}/{repo}/issues/comments"
     CONTRIBUTOR_ISSUES_URI = f"https://api.github.com/repos/{organization}/{repo}/issues"
     CONTRIBUTOR_STATS_URI = f"https://api.github.com/repos/{organization}/{repo}/stats/contributors"
 
 
     contributor_login = contributor
-    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI,headers=headers).json()
+    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI,auth=('')).json()
     weekly_commit_contribution = {}
     monthly_commit_contribution = {}
     yearly_commit_contribution = {}
     print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
-    print("COMMIT",contributor_commit_stats)
     for commit_statistic in contributor_commit_stats:
+        print(commit_statistic)
         if commit_statistic["author"]["login"]  == contributor_login:
             weekly_commit_contribution = commit_statistic["weeks"][-1]
             monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-4:])
@@ -90,18 +75,20 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     contributor_issue_stats_url_week  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
     contributor_issue_stats_url_month = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
 
-    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year,headers=headers).json())
-    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week,headers=headers).json())
-    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month,headers=headers).json())
+    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year,auth=(USER_NAME,token)).json())
+    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week,auth=(USER_NAME,token)).json())
+    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month,auth=(USER_NAME,token)).json())
 
     contributor_comments_url_year = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
     contributor_comments_url_month = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
     contributor_comments_url_week = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
 
-    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year,headers=headers).json() if comment["user"]["login"]==contributor_login])
-    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month,headers=headers).json() if comment["user"]["login"]==contributor_login])
-    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week,headers=headers).json() if comment["user"]["login"]==contributor_login])
-
+    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+    #DEBUG
+    print("DEBUG COMMENTS")
+    print(comment for comment in requests.request("GET",contributor_comments_url_week,auth=(USER_NAME,token)).json())
     individual_contributor_metric_stats = {
         "contributor_login" : contributor_login,
         "contribution_stats":{
@@ -136,14 +123,10 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
 
 @app.get('/contributors')
 def get_all_contributors(organization:str,repo:str):
-    with open("../github-access-token.txt",'r') as token_file:
-        token = token_file.readline()
-        headers = {
-            'Authorization':f'Basic {token}'
-        }
+
 
     repository_contributors_url = f"https://api.github.com/repos/{organization}/{repo}/contributors"
-    contributors = requests.request("GET",repository_contributors_url,headers=headers)
+    contributors = requests.request("GET",repository_contributors_url,auth=(USER_NAME,token))
     print(contributors)
     return contributors.json()
 

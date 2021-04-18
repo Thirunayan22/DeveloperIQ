@@ -1,16 +1,10 @@
 import ast
 import boto3
 import requests
-import threading
 import json
 import decimal
 import argparse
-import time
 from time import sleep
-TABLE_NAME = "DeveloperIQ"
-PRIMARY_KEY_COLUMN_NAME = "contributor_login"
-columns = ["contribution_stats"]
-
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -26,7 +20,11 @@ class DBActions:
         self.organization =  organization
         self.repository   = repository
         self.get_contributors_url = f"http://127.0.0.1:8001/contributors?organization={organization}&repo={repository}"
-
+        self.TABLE_NAME = "DeveloperIQ"
+        self.PRIMARY_KEY_COLUMN_NAME = "contributor_login"
+        self.columns = ["contributor_stats"]
+        self.db = boto3.resource("dynamodb")
+        self.table = self.db.Table(self.TABLE_NAME)
 
     def update_cache_db(self,contributor_login:str):
 
@@ -36,16 +34,13 @@ class DBActions:
         """
 
 
-        db = boto3.resource("dynamodb")
-        table = db.Table(TABLE_NAME)
 
-        # TODO COMAPARE BOTH ARRAYS
         LIVE_CONTRIBUTOR_SNAPSHOT_URL = f"http://localhost:8001/contributor/snapshot?repo={self.repository}&organization={self.organization}&contributor={contributor_login}"
 
         try:
             contributor_github_data = requests.request("GET",LIVE_CONTRIBUTOR_SNAPSHOT_URL).json()
-            contributor_db_data  = table.get_item(Key={
-                PRIMARY_KEY_COLUMN_NAME:contributor_login
+            contributor_db_data  = self.table.get_item(Key={
+                self.PRIMARY_KEY_COLUMN_NAME:contributor_login
             })
             contributor_db_data = ast.literal_eval((json.dumps(contributor_db_data,cls=DecimalEncoder)))
 
@@ -64,12 +59,12 @@ class DBActions:
                     return contributor_db_data['ResponseMetadata']['HTTPStatusCode']
                 else:
                     print("\nCHANGE PRESENT...INITIATING DB UPDATE......\n")
-                    push_contributor_response = self.push_contributor_data_db(table,contributor_login,payload=contributor_github_data['contribution_stats'])
+                    push_contributor_response = self.push_contributor_data_db(self.table,contributor_login,payload=contributor_github_data['contribution_stats'])
                     return push_contributor_response
             else:
                 print("CONTRIBUTOR NOT PRESENT IN CACHING DATABASE\n")
                 print("UPDATING DB\n")
-                push_contributor_response = self.push_contributor_data_db(table,contributor_login,payload=contributor_github_data['contribution_stats'])
+                push_contributor_response = self.push_contributor_data_db(self.table,contributor_login,payload=contributor_github_data['contribution_stats'])
                 return push_contributor_response
 
         except Exception as e:
@@ -79,28 +74,66 @@ class DBActions:
     def push_contributor_data_db(self,table,contributor_login,payload):
         response = table.put_item(
             Item = {
-                PRIMARY_KEY_COLUMN_NAME:contributor_login,
-                columns[0]:payload
+                self.PRIMARY_KEY_COLUMN_NAME:contributor_login,
+                self.columns[0]:payload
             }
         )
 
         return  response['ResponseMetadata']['HTTPStatusCode']
 
+    def get_contributor_data_db(self,contributor_login):
+        response = self.table.get_item(
+            Key = {
+                self.PRIMARY_KEY_COLUMN_NAME:contributor_login
+            }
+        )
+
+        return response
+
+    def get_all_contributor_data(self):
+        response = self.table.scan()
+        return response
+
     def update_all_contributors(self,delay):
         while True:
 
             contributors = requests.request("GET",self.get_contributors_url).json()
-            print("CONTRIBUTORS : ",contributors)
-            for contributor in contributors:
+            contributors_db = [db_contributor_name["contributor_login"] for db_contributor_name in self.get_all_contributor_data()["Items"]]
+            print(contributors)
+            uncached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] not in contributors_db ]
+            cached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] in contributors_db]
+
+            print(f"UNCACHED CONTRIBUTORS : {uncached_contributors}")
+            print(f"CACHED CONTRIBUTORS : {cached_contributors}")
+
+
+            print("UPDATING NEW CONTRIBUTORS TO DB...\n")
+            for uncached_contributor in uncached_contributors:
+                print(f"INDEXING CONTRIBUTOR : {uncached_contributor}")
                 try:
-                    contributor_login = contributor['login']
-                    print("INDEXING CONTRIBUTOR : " , contributor_login)
-                    response = self.update_cache_db(contributor_login)
+                    uncached_update = self.update_cache_db(uncached_contributor)
+                    sleep(delay)
+                    print(uncached_update)
                 except Exception as e:
-                    print("EXCEPTION OCCURED WHEN UPDATING ALL CONTRIBUTORS : ",e)
-                    print("CONTRIBUTOR DATA",contributor)
+                    print("EXCEPTION OCCURED WHEN UPDATING NEW CONTRIBUTOR : " ,uncached_contributor)
+                    print("RAW EXCEPTION : ",e)
+                    with open("error_logs_v2.txt","w+") as log:
+                        log.writelines(f"EXCEPTION {e}")
+
                     continue
-                sleep(delay)
+
+
+            sleep(3600)
+            print("UPDATING EXISTING CONRIBUTOR DATA TO DB...")
+            for cached_contributor in cached_contributors:
+                try:
+                   cached_update = self.update_cache_db(cached_contributor)
+                   sleep(delay)
+
+                except Exception as e:
+                    print(f"EXCEPTION OCCURED WHEN UPDATING EXSITING CONTRIBUTOR : {cached_contributor}")
+                    print("RAW EXCEPTION : ",e)
+                    continue
             sleep(secs=432000)
 
 
@@ -108,19 +141,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Take in input")
     parser.add_argument('--org',type=str,required=True)
     parser.add_argument('--repo',type=str,required=True)
-    parser.add_argument('--delay',type=int,required=False)
-    parser.add_argument('--login',type=str,required=False)
+    parser.add_argument('--delay',type=int,default=10,required=False)
 
     args = parser.parse_args()
 
     organization = args.org
     repository   = args.repo
-    contributor_login = args.login
     delay  = int(args.delay)
 
     db_actions = DBActions(organization,repository)
     response = db_actions.update_all_contributors(delay)
-    # response = db_actions.update_cache_db(contributor_login)
     print(f"\n RESPONSE : {response}")
 
 # TODO ADD NGROK TUNNEL IF THERE IS NO OTHER FIX FOR THE API THRESHOLD LIMIT
