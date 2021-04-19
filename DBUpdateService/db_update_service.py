@@ -98,10 +98,12 @@ class DBActions:
         while True:
 
             contributors = requests.request("GET",self.get_contributors_url).json()
-            contributors_db = [db_contributor_name["contributor_login"] for db_contributor_name in self.get_all_contributor_data()["Items"]]
-            print(contributors)
-            uncached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] not in contributors_db ]
-            cached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] in contributors_db]
+            contributors_db = [db_contributor_name["contributor_login"] for db_contributor_name in self.get_all_contributor_data()["Items"]
+                               if db_contributor_name["contributor_login"] != "rasabot"]
+            print(contributors_db)
+            uncached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] not in contributors_db and contributor["login"]!="rasabot"]
+            cached_contributors = [contributor["login"] for contributor in contributors if contributor["login"] in contributors_db and contributor["login"]!="rasabot"]
+
 
             print(f"UNCACHED CONTRIBUTORS : {uncached_contributors}")
             print(f"CACHED CONTRIBUTORS : {cached_contributors}")
@@ -123,7 +125,7 @@ class DBActions:
                     continue
 
 
-            sleep(3600)
+            sleep(delay)
             print("UPDATING EXISTING CONRIBUTOR DATA TO DB...")
             for cached_contributor in cached_contributors:
                 try:
@@ -153,6 +155,5 @@ if __name__ == "__main__":
     response = db_actions.update_all_contributors(delay)
     print(f"\n RESPONSE : {response}")
 
-# TODO ADD NGROK TUNNEL IF THERE IS NO OTHER FIX FOR THE API THRESHOLD LIMIT
 # TODO ADD CODE TO CHECK DATABASE FOR IF THE USER EXISTS IN THE DATABASE AND THEN ADD FIRST METRICS OF NEW USERS
 # TODO THEN ADD UPDATES TO METRICS OF OLD USERS

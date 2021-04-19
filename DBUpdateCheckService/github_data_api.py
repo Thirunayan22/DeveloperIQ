@@ -51,18 +51,19 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
 
 
     contributor_login = contributor
-    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI,auth=('')).json()
+    contributor_commit_stats = requests.request("GET", CONTRIBUTOR_STATS_URI,auth=(USER_NAME,token)).json()
     weekly_commit_contribution = {}
     monthly_commit_contribution = {}
     yearly_commit_contribution = {}
     print("CONTRIBUTOR COMMIT STATS : ",len(contributor_commit_stats))
     for commit_statistic in contributor_commit_stats:
-        print(commit_statistic)
         if commit_statistic["author"]["login"]  == contributor_login:
+            print("COMMIT STATS ", commit_statistic["weeks"][-1])
             weekly_commit_contribution = commit_statistic["weeks"][-1]
             monthly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-4:])
             yearly_commit_contribution = calculate_commit_contribution(commit_statistic["weeks"][-52:])
             break
+
 
     year_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1))).split('.')[0]
     week_since  = str(zulu.parse(datetime.datetime.now() - dateutil.relativedelta.relativedelta(weeks=1))).split('.')[0]
@@ -137,6 +138,7 @@ def calculate_commit_contribution(contribution_lst:List):
     total_commits   = 0
 
     for contribution_idx in range(len(contribution_lst)+1):
+
             if contribution_idx != 0:
                 total_additions += contribution_lst[contribution_idx-1]["a"]
                 total_deletions += contribution_lst[contribution_idx-1]["d"]
@@ -146,6 +148,7 @@ def calculate_commit_contribution(contribution_lst:List):
                     "deletions":total_deletions,
                     "number_of_commits":total_commits
     }
+
     return total_contribution
 
 
