@@ -3,6 +3,7 @@ import boto3
 import requests
 import json
 import decimal
+import logging
 import argparse
 from time import sleep
 
@@ -136,7 +137,8 @@ class DBActions:
                     print(f"EXCEPTION OCCURED WHEN UPDATING EXSITING CONTRIBUTOR : {cached_contributor}")
                     print("RAW EXCEPTION : ",e)
                     continue
-            sleep(secs=432000)
+            logging.info(f"BATCH UPDATE COMPLETED")
+            sleep(3600)
 
 
 if __name__ == "__main__":
