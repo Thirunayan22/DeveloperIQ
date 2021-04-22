@@ -9,6 +9,7 @@ from pydantic import BaseModel
 import uvicorn
 import requests
 import boto3
+
 from boto3.dynamodb.conditions import Key
 
 
@@ -29,9 +30,16 @@ def get_contributor_productivitiy_calculation(contributor_login:str):
         Key={
             primary_key_column_name:contributor_login
         }
-    )
+    )['Item']
+
+    weekly_contributor_metrics = contributor_metrics_raw_response["week"]
+
+
 
     return contributor_metrics_raw_response['Item']
+
+def calculate_contributor_productivity(raw_contributor_metric):
+    pass
 
 
 if __name__ == "__main__":
