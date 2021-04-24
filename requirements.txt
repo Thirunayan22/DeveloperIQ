@@ -33,7 +33,6 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 jmespath==0.10.0
 kafka-python==1.4.7
-layoutlm @ file:///C:/Users/Thirunayan/Desktop/RAIR/unilm/layoutlm
 lazy-object-proxy==1.4.3
 lxml==4.5.1
 Mako==1.1.4
@@ -53,7 +52,6 @@ python-multipart==0.0.5
 pytimeparse==1.1.8
 pytz==2021.1
 PyYAML==5.3.1
-rasa-x==0.37.1
 requests==2.25.1
 rope==0.17.0
 ruamel.yaml==0.16.13

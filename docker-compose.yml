@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db-update-check-service:
+    build: ./
+    container_name: db-update-check-service
+    restart: always
+    ports:
+    - 8001:8001
+    volumes:
+    - ./:/DeveloperIQ
+    command: python3 /DeveloperIQ/DBUpdateCheckService/github_data_api.py
+
+  db-update-service:
+    build: ./
+    container_name: db-update-service
+    restart: always
+    volumes:
+    - ./:/DeveloperIQ
+    command: python3 /DeveloperIQ/DBUpdateService/db_update_service.py
+
+  productivity-calculation-service:
+    build: ./
+    container_name: productivity-calculation-service
+    restart: always
+    ports:
+    - 8002:8002
+    volumes:
+    - ./:/DeveloperIQ
+    command: python3 /DeveloperIQ/ProductivityCalculationService/productivity_calculation_service.py
+
+
+

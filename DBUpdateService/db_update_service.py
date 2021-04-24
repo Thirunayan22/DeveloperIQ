@@ -7,11 +7,12 @@ import logging
 import argparse
 from time import sleep
 
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return int(o)
-        if isinstance(o, set):  #<---resolving sets as lists
+        if isinstance(o, set):
             return list(o)
         return super(DecimalEncoder, self).default(o)
 
@@ -33,8 +34,6 @@ class DBActions:
         Compare contributor data from github api and DB, look for changes and if there are any changes update DB with
         live changes in DB
         """
-
-
 
         LIVE_CONTRIBUTOR_SNAPSHOT_URL = f"http://localhost:8001/contributor/snapshot?repo={self.repository}&organization={self.organization}&contributor={contributor_login}"
 

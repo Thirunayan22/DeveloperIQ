@@ -110,7 +110,7 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
             },
 
             "year":{
-                "commit_additons": yearly_commit_contribution["additions"],
+                "commit_additions": yearly_commit_contribution["additions"],
                 "commit_deletions":yearly_commit_contribution["deletions"],
                 "num_commits" : yearly_commit_contribution["number_of_commits"],
                 "issues_created":num_issues_created_year,
