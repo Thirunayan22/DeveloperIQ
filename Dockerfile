@@ -8,7 +8,7 @@ RUN apt-get -y install python3-pip
 RUN apt-get -y install build-essential libssl-dev libffi-dev python-dev
 
 
-WORKDIR ./DeveloperIQ
+WORKDIR /DeveloperIQ
 
 COPY requirements.txt ./requirements.txt
 RUN pip3 --no-cache-dir install -r requirements.txt

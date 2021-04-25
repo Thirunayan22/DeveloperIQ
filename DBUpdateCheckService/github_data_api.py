@@ -20,7 +20,7 @@ every user
 app = FastAPI()
 ######
 USER_NAME = "Thirunayan22"
-with open("../github-access-token.txt", 'r') as token_file:
+with open("github-access-token.txt", 'r') as token_file:
     token = token_file.readline()
 
 @app.get("/contributor/snapshot")
@@ -153,4 +153,4 @@ def calculate_commit_contribution(contribution_lst:List):
 
 
 if __name__ == "__main__":
-    uvicorn.run("github_data_api:app", host="127.0.0.1", port=8001, reload=True)
+    uvicorn.run("github_data_api:app", host="0.0.0.0", port=8001, reload=True)

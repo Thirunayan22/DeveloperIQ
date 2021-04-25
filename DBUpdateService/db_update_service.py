@@ -1,4 +1,6 @@
 import ast
+import time
+
 import boto3
 import requests
 import json
@@ -21,7 +23,7 @@ class DBActions:
     def __init__(self,organization,repository):
         self.organization =  organization
         self.repository   = repository
-        self.get_contributors_url = f"http://127.0.0.1:8001/contributors?organization={organization}&repo={repository}"
+        self.get_contributors_url = f"http://db-update-check-service:8001/contributors?organization={organization}&repo={repository}"
         self.TABLE_NAME = "DeveloperIQ"
         self.PRIMARY_KEY_COLUMN_NAME = "contributor_login"
         self.columns = ["contributor_stats"]
@@ -35,7 +37,7 @@ class DBActions:
         live changes in DB
         """
 
-        LIVE_CONTRIBUTOR_SNAPSHOT_URL = f"http://localhost:8001/contributor/snapshot?repo={self.repository}&organization={self.organization}&contributor={contributor_login}"
+        LIVE_CONTRIBUTOR_SNAPSHOT_URL = f"http://db-update-check-service:8001/contributor/snapshot?repo={self.repository}&organization={self.organization}&contributor={contributor_login}"
 
         try:
             contributor_github_data = requests.request("GET",LIVE_CONTRIBUTOR_SNAPSHOT_URL).json()
@@ -151,7 +153,7 @@ if __name__ == "__main__":
     organization = args.org
     repository   = args.repo
     delay  = int(args.delay)
-
+    time.sleep(5)
     db_actions = DBActions(organization,repository)
     response = db_actions.update_all_contributors(delay)
     print(f"\n RESPONSE : {response}")

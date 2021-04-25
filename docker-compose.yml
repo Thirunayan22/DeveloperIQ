@@ -8,17 +8,21 @@ services:
     ports:
     - 8001:8001
     volumes:
-    - ./:/DeveloperIQ
-    command: python3 /DeveloperIQ/DBUpdateCheckService/github_data_api.py
+    - ./:/DeveloperIQ/
+    env_file:
+      - aws_env_creds.env
+    command: python3 DBUpdateCheckService/github_data_api.py
 
   db-update-service:
     build: ./
     container_name: db-update-service
     restart: always
     volumes:
-    - ./:/DeveloperIQ
-    command: python3 /DeveloperIQ/DBUpdateService/db_update_service.py
-
+    - ./:/DeveloperIQ/
+    env_file:
+      - aws_env_creds.env
+    command: python3 DBUpdateService/db_update_service.py --org RasaHQ --repo rasa --delay 5
+    depends_on: [db-update-check-service]
   productivity-calculation-service:
     build: ./
     container_name: productivity-calculation-service
@@ -26,8 +30,11 @@ services:
     ports:
     - 8002:8002
     volumes:
-    - ./:/DeveloperIQ
-    command: python3 /DeveloperIQ/ProductivityCalculationService/productivity_calculation_service.py
+    - ./:/DeveloperIQ/
+    env_file:
+      - aws_env_creds.env
+    command: python3 ProductivityCalculationService/productivity_calculation_service.py
+    depends_on: [db-update-service]
 
 
 
