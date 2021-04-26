@@ -77,4 +77,4 @@ def calculate_contributor_productivity(raw_contributor_metrics:Dict):
 
 
 if __name__ == "__main__":
-    uvicorn.run("productivity_calculation_service:app",host="127.0.0.1",port=8002,reload=True)
+    uvicorn.run("productivity_calculation_service:app",host="0.0.0.0",port=8002,reload=True)
