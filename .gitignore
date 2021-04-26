@@ -4,3 +4,7 @@
 /github-access-token.txt
 aws_env_creds.env
 *.env
+/ProductivityCalculationService/__pycache__
+/DBUpdateCheckService/__pycache__
+__pycache__/
+*.pyc
