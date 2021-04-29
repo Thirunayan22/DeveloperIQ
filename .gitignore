@@ -8,3 +8,6 @@ aws_env_creds.env
 /DBUpdateCheckService/__pycache__
 __pycache__/
 *.pyc
+
+docker-build.sh
+./docker-build.sh

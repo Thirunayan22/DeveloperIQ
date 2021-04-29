@@ -8,8 +8,8 @@ spec:
     app: developeriq-app
   ports:
   - protocol: "TCP"
-    port: 6000
-    targetPort: 5000
+    port: 6000 #Port which kubernetes service runs on
+    targetPort: 8002 #Port which the service is internally used by docker container
   type: LoadBalancer
 
 ---
@@ -32,4 +32,4 @@ spec:
         image: developer-iq-image
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5000
+        - containerPort: 8002
