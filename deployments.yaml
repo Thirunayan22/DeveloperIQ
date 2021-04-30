@@ -7,9 +7,10 @@ spec:
   selector:
     app: developeriq-app
   ports:
-  - protocol: "TCP"
-    port: 6000 #Port which kubernetes service runs on
-    targetPort: 8002 #Port which the service is internally used by docker container
+  - name: http
+    protocol: "TCP"
+    port: 7000 #Port which kubernetes service runs on
+    targetPort: 8002
   type: LoadBalancer
 
 ---
@@ -29,7 +30,7 @@ spec:
     spec:
       containers:
       - name: developeriq-app
-        image: developer-iq-image
-        imagePullPolicy: IfNotPresent
+        image: developer-iq-image:1.1
+        imagePullPolicy: Never
         ports:
         - containerPort: 8002

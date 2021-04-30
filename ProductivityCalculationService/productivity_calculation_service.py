@@ -23,7 +23,9 @@ columns = ["contribution_stats"]
 DB = boto3.resource('dynamodb')
 table = DB.Table(table_name)
 
-
+@app.get("/")
+def hello():
+    return "ping"
 @app.get("/contributor-productivity")
 def get_contributor_productivity_calculation(contributor_login:str):
     contributor_metrics_raw_response = table.get_item(
