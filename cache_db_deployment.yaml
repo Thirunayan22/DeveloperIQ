@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: developeriq-cache-update-check
-        image: developer-iq-image:1.1
+        image: developer-iq-image:latest
         imagePullPolicy: Never
         command: ["python3","DBUpdateCheckService/github_data_api.py"]
         ports:
