@@ -28,10 +28,12 @@ spec:
       labels:
         app: developeriq-productivity-calc
     spec:
+      imagePullSecrets:
+        - name: developeriq-registry-key
       containers:
       - name: developeriq-productivity-calc
-        image: developer-iq-image:latest
-        imagePullPolicy: Never
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq
         command: ["python3","ProductivityCalculationService/productivity_calculation_service.py"]
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8002
