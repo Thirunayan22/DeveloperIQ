@@ -34,6 +34,6 @@ spec:
       - name: developeriq-productivity-calc
         image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq
         command: ["python3","ProductivityCalculationService/productivity_calculation_service.py"]
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8002
