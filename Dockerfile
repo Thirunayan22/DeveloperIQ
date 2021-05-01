@@ -23,5 +23,4 @@ ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
 COPY . ./
 EXPOSE 8002
-
-CMD ["python3","ProductivityCalculationService/productivity_calculation_service.py"]
+EXPOSE 8001

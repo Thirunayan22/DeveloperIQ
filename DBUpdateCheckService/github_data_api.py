@@ -23,6 +23,11 @@ USER_NAME = "Thirunayan22"
 with open("github-access-token.txt", 'r') as token_file:
     token = token_file.readline()
 
+@app.get("/")
+def ping():
+    return "DB UPDATE CHECK SERVICE PING SUCCESSFUL : 200"
+
+
 @app.get("/contributor/snapshot")
 def get_contributer_commit_count(repo:str,organization:str,contributor:str):
 

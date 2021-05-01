@@ -24,8 +24,9 @@ DB = boto3.resource('dynamodb')
 table = DB.Table(table_name)
 
 @app.get("/")
-def hello():
-    return "ping"
+def ping():
+    return "PRODUCTIVITY CALCULATION SERVICE PING SUCCESSFUL : 200"
+
 @app.get("/contributor-productivity")
 def get_contributor_productivity_calculation(contributor_login:str):
     contributor_metrics_raw_response = table.get_item(

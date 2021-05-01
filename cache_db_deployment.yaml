@@ -1,0 +1,42 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: developeriq-cache-db-service
+spec:
+  selector:
+    app: developeriq-cache-db
+  ports:
+  - name: http
+    protocol: "TCP"
+    port: 7001 #Port which kubernetes service runs on
+    targetPort: 8001
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: developeriq-cache-db
+spec:
+  selector:
+    matchLabels:
+      app: developeriq-cache-db
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: developeriq-cache-db
+    spec:
+      containers:
+      - name: developeriq-cache-update-check
+        image: developer-iq-image:1.1
+        imagePullPolicy: Never
+        command: ["python3","DBUpdateCheckService/github_data_api.py"]
+        ports:
+          - containerPort: 8001
+
+      - name: developeriq-cache-update
+        image: developer-iq-image:1.1
+        imagePullPolicy: Never
+        command: ["python3","DBUpdateService/db_update_service.py", "--org", "RasaHQ", "--repo","rasa", "--delay", "20"]
