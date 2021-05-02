@@ -11,3 +11,4 @@ __pycache__/
 
 docker-build.sh
 ./docker-build.sh
+sliit-aecs-aws-key.pem
