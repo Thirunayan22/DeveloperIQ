@@ -32,13 +32,13 @@ spec:
         - name: developeriq-registry-key
       containers:
       - name: developeriq-cache-update-check
-        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq:1.1
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq:1.2
         imagePullPolicy: Always
         command: ["python3","DBUpdateCheckService/github_data_api.py"]
         ports:
           - containerPort: 8001
 
       - name: developeriq-cache-update
-        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq:1.1
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq:1.2
         imagePullPolicy: Always
         command: ["python3","DBUpdateService/db_update_service.py", "--org", "RasaHQ", "--repo","rasa", "--delay", "20"]
