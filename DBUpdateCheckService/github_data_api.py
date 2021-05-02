@@ -1,26 +1,30 @@
-import os
-import json
-import fastapi
 from typing import List, Optional, Set, Dict
 from fastapi import FastAPI
-from pydantic import BaseModel
 import requests
 import uvicorn
 import zulu
-import random
 import datetime
 import dateutil
 import dateutil.relativedelta
+import os
+import logging
+import sys
 
+sys.path.append(".")
 """
 For a given username this API should be able to return all information needed for the calculation of the metric for 
 every user
 """
 
 app = FastAPI()
-######
+######e
+GITHUB_ACCESS_TOKEN_PATH = "github-access-token.txt"
 USER_NAME = "Thirunayan22"
-with open("github-access-token.txt", 'r') as token_file:
+
+if not os.path.exists(GITHUB_ACCESS_TOKEN_PATH):
+    GITHUB_ACCESS_TOKEN_PATH = "../github-access-token.txt"
+
+with open(GITHUB_ACCESS_TOKEN_PATH, 'r') as token_file:
     token = token_file.readline()
 
 @app.get("/")

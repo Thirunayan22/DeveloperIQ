@@ -28,15 +28,17 @@ spec:
       labels:
         app: developeriq-cache-db
     spec:
+      imagePullSecrets:
+        - name: developeriq-registry-key
       containers:
       - name: developeriq-cache-update-check
-        image: developer-iq-image:latest
-        imagePullPolicy: Never
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq
+        imagePullPolicy: Always
         command: ["python3","DBUpdateCheckService/github_data_api.py"]
         ports:
           - containerPort: 8001
 
       - name: developeriq-cache-update
-        image: developer-iq-image:latest
-        imagePullPolicy: Never
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq
+        imagePullPolicy: Always
         command: ["python3","DBUpdateService/db_update_service.py", "--org", "RasaHQ", "--repo","rasa", "--delay", "20"]
