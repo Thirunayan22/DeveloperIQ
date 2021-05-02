@@ -32,7 +32,7 @@ spec:
         - name: developeriq-registry-key
       containers:
       - name: developeriq-productivity-calc
-        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq
+        image: 952614855265.dkr.ecr.us-east-1.amazonaws.com/developer-iq:1.1
         command: ["python3","ProductivityCalculationService/productivity_calculation_service.py"]
         imagePullPolicy: Always
         ports:
