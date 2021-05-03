@@ -22,7 +22,7 @@ spec:
   selector:
     matchLabels:
       app: developeriq-productivity-calc
-  replicas: 5
+  replicas: 2
   template:
     metadata:
       labels:
