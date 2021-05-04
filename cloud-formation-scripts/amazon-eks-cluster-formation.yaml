@@ -1,0 +1,40 @@
+Parameters:
+  KeyName:
+    Description: The EC2 key pair to allow to ssh into instance
+    Type: 'AWS::EC2::KeyPair::KeyName'
+
+Resources:
+  developerIqCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: developerIqCluster
+      RoleArn: arn:aws:iam::952614855265:role/developer-iq-cluster-role
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - sg-031df7cac8c2fe0c4
+        SubnetIds:
+          - subnet-0ee2d1b52db91dfe1
+          - subnet-0f3a3af350164a465
+          - subnet-0ebed7b1f91a1c626
+          - subnet-0ea264068d5cdf0c6
+
+  developerIqNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      NodegroupName: developer-iq-node-group
+      ClusterName: !Ref developerIqCluster
+      NodeRole: arn:aws:iam::952614855265:role/developer-iq-eks-worker-node-role
+      Subnets:
+        - subnet-0ee2d1b52db91dfe1
+        - subnet-0f3a3af350164a465
+        - subnet-0ebed7b1f91a1c626
+        - subnet-0ea264068d5cdf0c6
+
+      InstanceTypes:
+        - t3.small
+      RemoteAccess:
+        Ec2SshKey: !Ref KeyName
+      ScalingConfig:
+        MinSize: 2
+        DesiredSize: 2
+        MaxSize: 2
