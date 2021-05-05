@@ -50,7 +50,12 @@ def get_contributor_productivity_calculation(contributor_login:str):
 
         contributor_deviq_scores[time_frame]  = deviq_contributor_score
 
-    return contributor_deviq_scores
+
+    contributor_productivity_response  = {
+        "contributor_user_name" : contributor_login,
+        "contributor_productivity_scores": contributor_deviq_scores
+    }
+    return contributor_productivity_response
 
 
 def calculate_contributor_productivity(raw_contributor_metrics:Dict):
