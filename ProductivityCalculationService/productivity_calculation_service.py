@@ -34,6 +34,9 @@ def get_contributor_productivity_calculation(contributor_login:str):
             primary_key_column_name:contributor_login
         }
     )['Item']
+
+    #TODO HANDLE CACHE MISS SCENARIO
+
     print(contributor_metrics_raw_response)
     contributor_metrics_raw_response = ast.literal_eval((json.dumps(contributor_metrics_raw_response,cls=DecimalEncoder)))
     contributor_deviq_scores = {}
@@ -48,7 +51,7 @@ def get_contributor_productivity_calculation(contributor_login:str):
         deviq_contributor_score = calculate_contributor_productivity(contrib_data_timeframe[idx])
         time_frame = time_frames[idx]
 
-        contributor_deviq_scores[time_frame]  = deviq_contributor_score
+        contributor_deviq_scores[time_frame] = deviq_contributor_score
 
 
     contributor_productivity_response  = {
