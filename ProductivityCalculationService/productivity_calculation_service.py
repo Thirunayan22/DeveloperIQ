@@ -33,32 +33,39 @@ def get_contributor_productivity_calculation(contributor_login:str):
         Key={
             primary_key_column_name:contributor_login
         }
-    )['Item']
+    )
 
-    #TODO HANDLE CACHE MISS SCENARIO
+    if "Item" in contributor_metrics_raw_response: #CACHE HIT
+        print("CACHE HIT")
+        contributor_metrics_raw_response = contributor_metrics_raw_response["Item"]
 
-    print(contributor_metrics_raw_response)
-    contributor_metrics_raw_response = ast.literal_eval((json.dumps(contributor_metrics_raw_response,cls=DecimalEncoder)))
-    contributor_deviq_scores = {}
-    weekly_contributor_metrics = contributor_metrics_raw_response["contributor_stats"]["week"]
-    month_contributor_metrics  = contributor_metrics_raw_response["contributor_stats"]["month"]
-    yearly_contributor_metrics = contributor_metrics_raw_response["contributor_stats"]["year"]
+        print(contributor_metrics_raw_response)
+        contributor_metrics_raw_response = ast.literal_eval((json.dumps(contributor_metrics_raw_response,cls=DecimalEncoder)))
+        contributor_deviq_scores = {}
+        weekly_contributor_metrics = contributor_metrics_raw_response["contributor_stats"]["week"]
+        month_contributor_metrics  = contributor_metrics_raw_response["contributor_stats"]["month"]
+        yearly_contributor_metrics = contributor_metrics_raw_response["contributor_stats"]["year"]
 
-    time_frames  =  ["week","month","year"]
-    contrib_data_timeframe = [weekly_contributor_metrics,month_contributor_metrics,yearly_contributor_metrics]
+        time_frames  =  ["week","month","year"]
+        contrib_data_timeframe = [weekly_contributor_metrics,month_contributor_metrics,yearly_contributor_metrics]
 
-    for idx in range(len(contrib_data_timeframe)):
-        deviq_contributor_score = calculate_contributor_productivity(contrib_data_timeframe[idx])
-        time_frame = time_frames[idx]
+        for idx in range(len(contrib_data_timeframe)):
+            deviq_contributor_score = calculate_contributor_productivity(contrib_data_timeframe[idx])
+            time_frame = time_frames[idx]
 
-        contributor_deviq_scores[time_frame] = deviq_contributor_score
+            contributor_deviq_scores[time_frame] = deviq_contributor_score
 
 
-    contributor_productivity_response  = {
-        "contributor_user_name" : contributor_login,
-        "contributor_productivity_scores": contributor_deviq_scores
-    }
-    return contributor_productivity_response
+        contributor_productivity_response  = {
+            "contributor_user_name" : contributor_login,
+            "contributor_productivity_scores": contributor_deviq_scores
+        }
+        return contributor_productivity_response
+    else:
+        print("CACHE MISS")
+        #TODO HANDLE CACHE MISS
+        # github_data = requests.request("GET",f"http://localhost:8001/contributor/snapshot?organization=RasaHQ&repo=rasa&contributor=wochinge")
+        return "cache miss"
 
 
 def calculate_contributor_productivity(raw_contributor_metrics:Dict):
