@@ -28,7 +28,7 @@ def ping():
     return "PRODUCTIVITY CALCULATION SERVICE PING SUCCESSFUL : 200"
 
 @app.get("/contributor-productivity")
-def get_contributor_productivity_calculation(contributor_login:str):
+def get_contributor_productivity_calculation(repo:str,organization:str,contributor_login:str):
     contributor_metrics_raw_response = table.get_item(
         Key={
             primary_key_column_name:contributor_login
@@ -62,10 +62,10 @@ def get_contributor_productivity_calculation(contributor_login:str):
         }
         return contributor_productivity_response
     else:
-        print("CACHE MISS")
-        #TODO HANDLE CACHE MISS
-        # github_data = requests.request("GET",f"http://localhost:8001/contributor/snapshot?organization=RasaHQ&repo=rasa&contributor=wochinge")
-        return "cache miss"
+        # print("CACHE MISS")
+        github_live_metrics = requests.request("GET",f"http://localhost:8001/contributor/snapshot?organization={organization}&repo={repo}&contributor={contributor_login}")
+
+        return github_live_metrics
 
 
 def calculate_contributor_productivity(raw_contributor_metrics:Dict):

@@ -23,6 +23,7 @@ services:
     command: python3 DBUpdateService/db_update_service.py --org RasaHQ --repo rasa --delay 5
     network_mode: host
     depends_on: [db-update-check-service]
+
   productivity-calculation-service:
     build: ./
     container_name: productivity-calculation-service

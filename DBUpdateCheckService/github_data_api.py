@@ -81,21 +81,32 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
     print("WEEK  : " ,week_since)
     print("YEAR  : ",year_since)
     print("MONTH : ",month_since)
-    contributor_issue_stats_url_year  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={year_since}"
-    contributor_issue_stats_url_week  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
-    contributor_issue_stats_url_month = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
+    try:
+        contributor_issue_stats_url_year  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={year_since}"
+        contributor_issue_stats_url_week  = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={week_since}"
+        contributor_issue_stats_url_month = f"{CONTRIBUTOR_ISSUES_URI}?creator={contributor_login}&since={month_since}"
 
-    num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year,auth=(USER_NAME,token)).json())
-    num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week,auth=(USER_NAME,token)).json())
-    num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month,auth=(USER_NAME,token)).json())
+        num_issues_created_year  = len(requests.request("GET",contributor_issue_stats_url_year,auth=(USER_NAME,token)).json())
+        num_issues_created_week  = len(requests.request("GET",contributor_issue_stats_url_week,auth=(USER_NAME,token)).json())
+        num_issues_created_month = len(requests.request("GET",contributor_issue_stats_url_month,auth=(USER_NAME,token)).json())
 
-    contributor_comments_url_year = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
-    contributor_comments_url_month = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
-    contributor_comments_url_week = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
+        contributor_comments_url_year = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={year_since}"
+        contributor_comments_url_month = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={month_since}"
+        contributor_comments_url_week = f"{CONTRIBUTOR_ISSUES_COMMENTS_URI}?since={week_since}"
 
-    num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
-    num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
-    num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+
+        num_comments_year = len([comment for comment in requests.request("GET",contributor_comments_url_year,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+        num_comments_month = len([comment for comment in requests.request("GET",contributor_comments_url_month,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+        num_comments_week = len([comment for comment in requests.request("GET",contributor_comments_url_week,auth=(USER_NAME,token)).json() if comment["user"]["login"]==contributor_login])
+    except TypeError as typeError:
+        print("TYPE ERROR OCCURED",typeError)
+        # print(requests.request("GET",contributor_comments_url_year,auth=(USER_NAME,token)).json())
+
+    except KeyError as keyError:
+        print("KEY ERROR OCCURED",keyError)
+
+
+
     #DEBUG
     print("DEBUG COMMENTS")
     print(comment for comment in requests.request("GET",contributor_comments_url_week,auth=(USER_NAME,token)).json())
