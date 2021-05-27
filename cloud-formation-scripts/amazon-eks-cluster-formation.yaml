@@ -190,7 +190,7 @@ Resources:
       MapPublicIpOnLaunch: true
       AvailabilityZone:
         Fn::Select:
-        - '1'
+        - '0'
         - Fn::GetAZs:
             Ref: AWS::Region
       CidrBlock:
@@ -231,7 +231,7 @@ Resources:
     Properties:
       AvailabilityZone:
         Fn::Select:
-        - '1'
+        - '0'
         - Fn::GetAZs:
             Ref: AWS::Region
       CidrBlock:

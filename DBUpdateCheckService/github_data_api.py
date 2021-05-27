@@ -102,6 +102,7 @@ def get_contributer_commit_count(repo:str,organization:str,contributor:str):
         print("TYPE ERROR OCCURED",typeError)
         # print(requests.request("GET",contributor_comments_url_year,auth=(USER_NAME,token)).json())
 
+
     except KeyError as keyError:
         print("KEY ERROR OCCURED",keyError)
 

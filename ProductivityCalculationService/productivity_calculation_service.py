@@ -62,7 +62,7 @@ def get_contributor_productivity_calculation(repo:str,organization:str,contribut
         }
         return contributor_productivity_response
     else:
-        # print("CACHE MISS")
+        print("CACHE MISS")
         github_live_metrics = requests.request("GET",f"http://localhost:8001/contributor/snapshot?organization={organization}&repo={repo}&contributor={contributor_login}")
 
         return github_live_metrics
